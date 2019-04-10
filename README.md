@@ -1,1 +1,1 @@
-> make some useful vue syntax the same with miniprogram.
+> make some useful vue syntax adapt to miniprogram.
