@@ -2,6 +2,7 @@
   "name": "vue-mp-polyfill",
   "version": "1.0.0",
   "main": "lib/index.js",
+  "description": "make some useful vue syntax adapt to miniprogram",
   "repository": "https://github.com/famanoder/vue-mp-polyfill.git",
   "author": "famanoder",
   "license": "MIT"
