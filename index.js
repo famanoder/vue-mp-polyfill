@@ -1,5 +1,5 @@
-const {getType, defProp} = require('./utils/index');
-const Computed = require('./lib/computed');
+const {getType} = require('./utils/index');
+const vueifyDataComputedWatch = require('./lib/vueifyDataComputedWatch');
 
 function NutComponent(obj) {
   if(getType(Component) !== 'function') return console.error(`no mp 'Component' function.`);
@@ -12,6 +12,7 @@ function NutComponent(obj) {
     }
   };
 
+  // 把 computed 的 key 加入 data
   const computedKeys = Object.keys(computed);
   if(computedKeys.length) {
     computedKeys.forEach(k => _data[k] = null);
@@ -42,7 +43,8 @@ function NutComponent(obj) {
       // computed的key：1. 相互依赖；2. 依赖各种data；3. data与computed都有依赖
       // 所以将computed与data合并，重新修改setter，在set中触发computed
       if (computed && getType(computed) === 'object' && Object.keys(computed).length) {
-        Computed(this, computed);
+        console.log('this,',this);
+        vueifyDataComputedWatch(this, computed, watch);
       } 
       if(watch && getType(watch) === 'object' && Object.keys(watch).length) {
         
@@ -57,57 +59,3 @@ function NutComponent(obj) {
 }
 
 module.exports = NutComponent;
-
-// watcher
-// dep
-const data = {
-  a: 12,
-  b: 23,
-  c: 'aa'
-}
-const computeds = {
-  d() {return data.a + data.b;},
-  e() {return data.a + data.c;}
-}
-const deps = {};
-
-function def(obj, key, val) {
-  Object.defineProperty(obj, key, {
-    set(v) {
-      // this.setData({[k]: v});
-      obj[key] = v;
-      val = v;
-      const _deps = deps[key] || [];
-      if(_deps.length) {
-
-      }
-    },
-    get() {
-      const k = deps.target;
-      if(k && !deps[key]) {
-        const keyDeps = deps[key] || [];
-        keyDeps.push(k);
-        deps[key] = keyDeps;
-      }
-      return val;
-    }
-  });
-}
-
-for(let a in data) {
-  def(data, a, data[a]);
-}
-
-function initComputedDeps() {
-  for(let k in computeds) {
-    deps.target = k;
-    deps[k] = [];
-    const v = computeds[k]();
-    // this.setData({
-    //   [k]: v
-    // });
-    delete deps.target;
-  }
-}
-
-initComputedDeps();
